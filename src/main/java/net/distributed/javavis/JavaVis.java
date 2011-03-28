@@ -5,33 +5,22 @@ package net.distributed.javavis;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.FileDialog;
-import java.awt.Frame;
-import java.awt.Label;
-import java.awt.Menu;
-import java.awt.MenuBar;
-import java.awt.MenuItem;
-import java.awt.MenuShortcut;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import javax.swing.*;
 
 // Main Frame
-public class JavaVis extends Frame
+public class JavaVis extends JFrame
 {
-    /**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	GraphPanel graphPanel;
     final AboutDialog aboutDialog = new AboutDialog(this);
     final LogFileHistory lfh;
-    MenuItem refreshItem;
+    JMenuItem refreshItem;
     static String[] arguments;
 
     // Constructor
@@ -46,45 +35,39 @@ public class JavaVis extends Frame
         //}
 
         // Create Menu
-        MenuBar menuBar;
-        Menu menu;
-        MenuItem menuItem;
+        final JMenuBar menuBar = new JMenuBar();
+        this.setJMenuBar(menuBar);
 
-        menuBar = new MenuBar();
-        this.setMenuBar(menuBar);
-
-        menu = new Menu("File");
-        menu.setShortcut(new MenuShortcut(KeyEvent.VK_F));
+        JMenu menu = new JMenu("File");
+        menu.setMnemonic('F');
         menuBar.add(menu);
 
-        menuItem = new MenuItem("Open log file...");
-        final FileDialog fileDialog = new FileDialog(this);
-        menuItem.addActionListener(new ActionListener() {
+        JMenuItem menuItem = new JMenuItem("Open log file...");
+        final JFileChooser fileDialog = new JFileChooser();
+        menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 // Create a file chooser
-                fileDialog.setMode(FileDialog.LOAD);
-                fileDialog.setVisible(true);
+                fileDialog.showOpenDialog(menuBar);
 
                 // In response to a button click:
-                String filename = fileDialog.getFile();
-                if (filename != null) {
-                    File file = new File(fileDialog.getDirectory(), filename);
+                File file = fileDialog.getSelectedFile();
+                if (file != null) {
                     lfh.addFile(file);
                     handleOpenFile(file);
                 }
 
             }
         });
-        menuItem.setShortcut(new MenuShortcut(KeyEvent.VK_O));
+        menuItem.setMnemonic('0');
         menu.add(menuItem);
 
-        refreshItem = new MenuItem("Refresh");
+        refreshItem = new JMenuItem("Refresh");
         refreshItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 graphPanel.readLogData();
             }
         });
-        refreshItem.setShortcut(new MenuShortcut(KeyEvent.VK_R));
+        refreshItem.setMnemonic('R');
         refreshItem.setEnabled(false);
         menu.add(refreshItem);
         menu.addSeparator();
@@ -93,38 +76,34 @@ public class JavaVis extends Frame
         File[] files = lfh.getFiles();
         for(int i = 0; i< files.length; i++){
             if(files[i] != null){
-                menuItem = new MenuItem(files[i].toString());
+                menuItem = new JMenuItem(files[i].toString());
                 menu.add(menuItem);
-                menuItem.addActionListener(new ActionListener() {
+                menu.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e){
-                            handleOpenFile(new File(((MenuItem)e.getSource()).getLabel()));
+                            handleOpenFile(new File(((JMenuItem)e.getSource()).getText()));
                     }
                 });
             }
         }
 
-        menuItem = new MenuItem("Quit");
-        menuItem.addActionListener(new ActionListener() {
+        menuItem = new JMenuItem("Quit");
+        menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 handleQuit();
             }
         });
-        menuItem.setShortcut(new MenuShortcut(KeyEvent.VK_Q));
-        menu.add(menuItem);
+        menu.setMnemonic('Q');
+        menu.add(menu);
+            menu = new JMenu("Help");
 
-//        if (MRJApplicationUtils.isMRJToolkitAvailable() && System.getProperty("os.name").equals("Mac OS")) {
-            // Under "Mac OS" (!="Mac OS X") the "About box" is provided by the MRJApplicationUtils
-//        } else {
-            menu = new Menu("Help");
-
-            menuItem = new MenuItem("About JavaVis...");
+            menuItem = new JMenuItem("About JavaVis...");
             menuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     handleAbout();
                 }
             });
-            menuItem.setShortcut(new MenuShortcut(KeyEvent.VK_A));
-            menu.add(menuItem);
+            menu.setMnemonic('A');
+            menu.add(menu);
             try {
                 menuBar.setHelpMenu(menu);
                 // avoid the double Help menu problem on Mac OS 8 and later
@@ -133,14 +112,13 @@ public class JavaVis extends Frame
                 // fall back on old strategy
                 menuBar.add(menu);
             }
-//        }
         
-        Component contents = createComponents();
+        JComponent contents = createComponents();
         //getContentPane().add(contents, BorderLayout.CENTER);
         setBackground(Color.lightGray);
         add(contents, BorderLayout.CENTER);
         add("West",new leftPanel());
-        add("South",new Label("Work Unit completion date",Label.CENTER));
+        add("South",new JLabel("Work Unit completion date",JLabel.CENTER));
 
         // Finish setting up the frame, and show it.
         addWindowListener(new WindowAdapter() {
@@ -157,14 +135,11 @@ public class JavaVis extends Frame
         
     }
 
-    public Component createComponents()
+    public JComponent createComponents()
     {
         // Create an internal panel to hold the graph
         graphPanel = new GraphPanel()
         {
-            /**
-			 * 
-			 */
 			private static final long serialVersionUID = 1L;
 
 			public Dimension getPreferredSize()
@@ -179,15 +154,9 @@ public class JavaVis extends Frame
     public static void main(String[] args)
     {
         arguments = args;
-        
-//        if (MRJApplicationUtils.isMRJToolkitAvailable()) {
-//            // Create the top-level container and add contents to it.
-//            final MacOSMRJToolkitFrame app = new MacOSMRJToolkitFrame("distributed.net Logfile Visualizer");
-//		  }
-//		  else {
-            // Create the top-level container and add contents to it.
-           	new JavaVis("distributed.net Logfile Visualizer");
-//        }
+
+		// Create the top-level container and add contents to it.
+		new JavaVis("distributed.net Logfile Visualizer");
     }
 
     public void handleOpenFile(File file) {

@@ -5,17 +5,26 @@
 
 package net.distributed.javavis;
 
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.Graphics;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Image;
+import java.awt.LayoutManager;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.net.URL;
 
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JFrame;
 
-class AboutDialog extends Dialog
+class AboutDialog extends JDialog
 {
 	private static final long serialVersionUID = 1L;
 	private Image Cow;
 
-    class OKButton extends Button implements ActionListener
+    class OKButton extends JButton implements ActionListener
     {
 		private static final long serialVersionUID = 1L;
 
@@ -31,7 +40,7 @@ class AboutDialog extends Dialog
         }
     }
 
-    AboutDialog(Frame parent)
+    AboutDialog(JFrame parent)
     {
         super(parent, "About this program", true);
         setSize(380,300);
@@ -43,16 +52,16 @@ class AboutDialog extends Dialog
         gbc.insets.left = 60;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.gridwidth = GridBagConstraints.REMAINDER;
-        add(new Label("distributed.net Log Visualizer v1.6"), gbc);
-        add(new Label("programmed by:"), gbc);
-        add(new Label("  Jeff \"Bovine\" Lawson <jlawson@bovine.net>"), gbc);
-        add(new Label("  William Goo <wgoo@hmc.edu>"), gbc);
-        add(new Label("  Yves Hetzer <aetsch@gmx.de>"), gbc);
-        add(new Label("  Greg Hewgill <greg@hewgill.com>"), gbc);
-        add(new Label("  Jason Townsend <townsend@cs.stanford.edu>"), gbc);
-        add(new Label("  Andy Hedges <andy@hedges.net>"), gbc);
-        add(new Label("  Stanley Appel <s.appel@bigfoot.com>"), gbc);
-        add(new Label(), gbc);
+        add(new JLabel("distributed.net Log Visualizer v1.6"), gbc);
+        add(new JLabel("programmed by:"), gbc);
+        add(new JLabel("  Jeff \"Bovine\" Lawson <jlawson@bovine.net>"), gbc);
+        add(new JLabel("  William Goo <wgoo@hmc.edu>"), gbc);
+        add(new JLabel("  Yves Hetzer <aetsch@gmx.de>"), gbc);
+        add(new JLabel("  Greg Hewgill <greg@hewgill.com>"), gbc);
+        add(new JLabel("  Jason Townsend <townsend@cs.stanford.edu>"), gbc);
+        add(new JLabel("  Andy Hedges <andy@hedges.net>"), gbc);
+        add(new JLabel("  Stanley Appel <s.appel@bigfoot.com>"), gbc);
+        add(new JLabel(), gbc);
         gbc.insets.left = 0;
         gbc.fill = GridBagConstraints.NONE;
         add(new OKButton(), gbc);

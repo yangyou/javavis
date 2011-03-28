@@ -8,14 +8,10 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
-import java.awt.MenuItem;
-import java.awt.Panel;
-import java.awt.PopupMenu;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -27,11 +23,13 @@ import java.util.Enumeration;
 import java.util.NoSuchElementException;
 import java.util.Vector;
 
-public class GraphPanel extends Panel implements MouseMotionListener,
-		MouseListener, ActionListener {
-	/**
-	 * 
-	 */
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.event.MouseInputListener;
+
+public class GraphPanel extends JPanel  
+{
 	private static final long serialVersionUID = 1L;
 	// Empty borders
 	protected final int topBorder = 10;
@@ -73,33 +71,108 @@ public class GraphPanel extends Panel implements MouseMotionListener,
 
 		// set the flags
 		loggerstate = nologloaded;
-		addMouseListener(this);
-		addMouseMotionListener(this);
+		
+		PopupTriggerListener popup = new PopupTriggerListener();
+		addMouseListener(popup);
+		addMouseMotionListener(popup);
 
 		setBackground(Color.lightGray);
 	}
 
-	public void actionPerformed(ActionEvent e) {
-		if (e.getActionCommand() == "complete") {
-			setRange(-1, -1);
-			startx = -1;
-			endx = -1;
+	class PopupTriggerListener implements MouseInputListener,MouseListener, ActionListener{
+		public void mousePressed(MouseEvent ev) {
+			if (ev.isPopupTrigger()) {
+				JPopupMenu pm = new JPopupMenu("Zoom");
+				JMenuItem mi = new JMenuItem("complete");
+				mi.addActionListener(this);
+				pm.add(mi);
+				add(pm);
+				pm.show(ev.getComponent(), ev.getX(), ev.getY());
+				// pm.show(this,e.getX(),e.getY());
+				// System.out.println("popup");
+			} else {
+				startx = ev.getX();
+				endx = ev.getX() + 1;
+			}
 			repaint();
 		}
 
-		if (e.getActionCommand() == "today") {
-			long utc = getUTCForDay();
-			setRange(utc / 100, utc / 100 + 864000);
-			startx = -1;
-			endx = -1;
+		public void mouseReleased(MouseEvent ev) {
+			if (width <= 0 || height <= 0) {
+				return; // don't do anything if we don't have graph data
+			}
+			if (ev.isPopupTrigger()) {
+				JPopupMenu pm = new JPopupMenu("Zoom");
+				JMenuItem mi = new JMenuItem("complete");
+				mi.addActionListener(this);
+				pm.add(mi);
+				add(pm);
+				pm.show(ev.getComponent(), ev.getX(), ev.getY());
+				// System.out.println("popup");
+			} else {
+				if (Math.abs(startx - endx) < 10) {
+					startx = -1;
+					endx = -1;
+				}
+				if ((startx != -1) && (endx != -1)) {
+					if (startx < endx)
+						setRange(rangestart + (startx - leftBorder)
+								* (rangeend - rangestart) / width, rangestart
+								+ (endx - leftBorder) * (rangeend - rangestart)
+								/ width);
+					if (startx > endx)
+						setRange(rangestart + (endx - leftBorder)
+								* (rangeend - rangestart) / width, rangestart
+								+ (startx - leftBorder) * (rangeend - rangestart)
+								/ width);
+				}
+				// System.out.println(rangestart+" , "+rangeend);
+				startx = -1;
+				endx = -1;
+			}
+			repaint();			
+		}
+
+		public void mouseClicked(MouseEvent ev) {
+		}
+
+		public void mouseEntered(MouseEvent e) {
+		}
+
+		public void mouseExited(MouseEvent e) {
+		}
+
+		public void mouseDragged(MouseEvent e) {
+			endx = e.getX();
 			repaint();
 		}
-		if (e.getActionCommand() == "yesterday") {
-			long utc = getUTCForDay();
-			setRange(utc / 100 - 864000, utc / 100);
-			startx = -1;
-			endx = -1;
-			repaint();
+
+		public void mouseMoved(MouseEvent e) {
+			// endx = e.getX();
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			if (e.getActionCommand() == "complete") {
+				setRange(-1, -1);
+				startx = -1;
+				endx = -1;
+				repaint();
+			}
+
+			if (e.getActionCommand() == "today") {
+				long utc = getUTCForDay();
+				setRange(utc / 100, utc / 100 + 864000);
+				startx = -1;
+				endx = -1;
+				repaint();
+			}
+			if (e.getActionCommand() == "yesterday") {
+				long utc = getUTCForDay();
+				setRange(utc / 100 - 864000, utc / 100);
+				startx = -1;
+				endx = -1;
+				repaint();
+			}			
 		}
 	}
 
@@ -111,80 +184,6 @@ public class GraphPanel extends Panel implements MouseMotionListener,
 		cal.clear();
 		cal.set(year, month, date);
 		return cal.getTime().getTime();
-	}
-
-	public void mouseClicked(MouseEvent e) {
-
-	}
-
-	public void mousePressed(MouseEvent e) {
-		if (e.isPopupTrigger()) {
-			PopupMenu pm = new PopupMenu("Zoom");
-			MenuItem mi = new MenuItem("complete");
-			mi.addActionListener(this);
-			pm.add(mi);
-			add(pm);
-			pm.show(this, e.getX(), e.getY());
-			// pm.show(this,e.getX(),e.getY());
-			// System.out.println("popup");
-		} else {
-			startx = e.getX();
-			endx = e.getX() + 1;
-		}
-		repaint();
-	}
-
-	public void mouseReleased(MouseEvent e) {
-		if (width <= 0 || height <= 0) {
-			return; // don't do anything if we don't have graph data
-		}
-		if (e.isPopupTrigger()) {
-			PopupMenu pm = new PopupMenu("Zoom");
-			MenuItem mi = new MenuItem("complete");
-			mi.addActionListener(this);
-			pm.add(mi);
-			add(pm);
-			pm.show(this, e.getX(), e.getY());
-			// System.out.println("popup");
-		} else {
-			if (Math.abs(startx - endx) < 10) {
-				startx = -1;
-				endx = -1;
-			}
-			if ((startx != -1) && (endx != -1)) {
-				if (startx < endx)
-					setRange(rangestart + (startx - leftBorder)
-							* (rangeend - rangestart) / width, rangestart
-							+ (endx - leftBorder) * (rangeend - rangestart)
-							/ width);
-				if (startx > endx)
-					setRange(rangestart + (endx - leftBorder)
-							* (rangeend - rangestart) / width, rangestart
-							+ (startx - leftBorder) * (rangeend - rangestart)
-							/ width);
-			}
-			// System.out.println(rangestart+" , "+rangeend);
-			startx = -1;
-			endx = -1;
-		}
-		repaint();
-	}
-
-	public void mouseEntered(MouseEvent e) {
-
-	}
-
-	public void mouseExited(MouseEvent e) {
-
-	}
-
-	public void mouseDragged(MouseEvent e) {
-		endx = e.getX();
-		repaint();
-	}
-
-	public void mouseMoved(MouseEvent e) {
-		// endx = e.getX();
 	}
 
 	// public interface methods.

@@ -5,12 +5,16 @@
 
 package net.distributed.javavis;
 
-import java.awt.*;
-import java.awt.image.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.image.MemoryImageSource;
+import java.awt.image.PixelGrabber;
 
+import javax.swing.JPanel;
 
-public class leftPanel
-extends Panel
+public class leftPanel extends JPanel
 {
 	private static final long serialVersionUID = 8486147270228332941L;
 	private java.awt.Image img;
@@ -58,7 +62,7 @@ extends Panel
                 int c = pixels[y+(x)*height];
 
                 // Due a bug in the MS-JavaVM the Background for Images are not the same
-                // as for Panel's  so. mark it as non-opaque ..
+                // as for JPanel's  so. mark it as non-opaque ..
                 if (c != 0xff000000)
                 {
                     c = 0;

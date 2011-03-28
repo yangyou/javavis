@@ -15,13 +15,6 @@ containing all of the pre-compiled Java class files.
 If you have the Sun JAVA SDK installed, execute this JAR with:
 	java -jar JavaVis.jar
 
-If you have the Microsoft Java VM installed, execute this JAR with:
-	jview /cp:a JavaVis.jar JavaVis.class
-
-
-
-The Java source code is available in the enclosed zip file.
-
 For more information about distributed.net and how to become a part of
 the largest computer on earth, please visit http://www.distributed.net/
 
