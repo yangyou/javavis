@@ -3,6 +3,8 @@
 // Any other distribution or use of this source violates copyright.
 //
 
+package net.distributed.javavis;
+
 import java.awt.*;
 import java.awt.image.*;
 
@@ -10,7 +12,8 @@ import java.awt.image.*;
 public class leftPanel
 extends Panel
 {
-    private java.awt.Image img;
+	private static final long serialVersionUID = 8486147270228332941L;
+	private java.awt.Image img;
     private int width=20;
     private int height=200;
 

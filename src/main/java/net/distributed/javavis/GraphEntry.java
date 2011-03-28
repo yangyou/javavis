@@ -2,6 +2,7 @@
 // For use in distributed.net projects only.
 // Any other distribution or use of this source violates copyright.
 //
+package net.distributed.javavis;
 
 class GraphEntry
 {

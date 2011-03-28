@@ -1,33 +1,34 @@
 // Copyright distributed.net 1997-2002- All Rights Reserved
 // For use in distributed.net projects only.
 // Any other distribution or use of this source violates copyright.
+package net.distributed.javavis;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FileDialog;
+import java.awt.Frame;
+import java.awt.Label;
+import java.awt.Menu;
+import java.awt.MenuBar;
+import java.awt.MenuItem;
+import java.awt.MenuShortcut;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
-import java.awt.*;
-import java.awt.event.*;
-
-//import com.apple.mrj.*; // MRJToolkitStubs.zip provides empty declarations to link against
-
-/* 
-class MacOSMRJToolkitFrame extends JavaVis implements MRJAboutHandler, MRJOpenDocumentHandler, MRJQuitHandler
-{
-    public MacOSMRJToolkitFrame(String title)
-    {
-        // Parent Constructor
-        super(title);
-        
-       // Register ourselves with MacOS Runtime for Java (MRJ) system event handlers
-        MRJApplicationUtils.registerAboutHandler(this);
-        MRJApplicationUtils.registerQuitHandler(this);
-        MRJApplicationUtils.registerOpenDocumentHandler(this);   
-    }
-}
-*/
 
 // Main Frame
 public class JavaVis extends Frame
 {
-    GraphPanel graphPanel;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	GraphPanel graphPanel;
     final AboutDialog aboutDialog = new AboutDialog(this);
     final LogFileHistory lfh;
     MenuItem refreshItem;
@@ -62,7 +63,7 @@ public class JavaVis extends Frame
             public void actionPerformed(ActionEvent e) {
                 // Create a file chooser
                 fileDialog.setMode(FileDialog.LOAD);
-                fileDialog.show();
+                fileDialog.setVisible(true);
 
                 // In response to a button click:
                 String filename = fileDialog.getFile();
@@ -161,7 +162,12 @@ public class JavaVis extends Frame
         // Create an internal panel to hold the graph
         graphPanel = new GraphPanel()
         {
-            public Dimension getPreferredSize()
+            /**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
+			public Dimension getPreferredSize()
             {
                 return new Dimension(620,320);
             }
@@ -180,7 +186,7 @@ public class JavaVis extends Frame
 //		  }
 //		  else {
             // Create the top-level container and add contents to it.
-            final JavaVis app = new JavaVis("distributed.net Logfile Visualizer");
+           	new JavaVis("distributed.net Logfile Visualizer");
 //        }
     }
 
@@ -193,7 +199,7 @@ public class JavaVis extends Frame
     }
 
     public void handleAbout() {
-        aboutDialog.show();
+        aboutDialog.setVisible(true);
     }
 
     public void handleQuit() {

@@ -3,6 +3,8 @@
 // Any other distribution or use of this source violates copyright.
 //
 
+package net.distributed.javavis;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.net.URL;
@@ -10,11 +12,14 @@ import java.net.URL;
 
 class AboutDialog extends Dialog
 {
-    private Image Cow;
+	private static final long serialVersionUID = 1L;
+	private Image Cow;
 
     class OKButton extends Button implements ActionListener
     {
-        public OKButton()
+		private static final long serialVersionUID = 1L;
+
+		public OKButton()
         {
             super("OK");
             addActionListener(this);

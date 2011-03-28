@@ -2,12 +2,14 @@
 // For use in distributed.net projects only.
 // Any other distribution or use of this source violates copyright.
 //
+package net.distributed.javavis;
 
 import java.io.*;
 
 public class LogFileHistory implements Serializable
 {
-    private static final int size = 4;
+	private static final long serialVersionUID = -9183609747166505465L;
+	private static final int size = 4;
     private File[] files = new File[size];
     private static File logHistoryFile = new File("LogFileHistory.bin");
 
@@ -63,12 +65,9 @@ public class LogFileHistory implements Serializable
         } catch (ClassNotFoundException cnfe) {
 
         } finally {
-            if (lfh == null) {
-                return new LogFileHistory();
-            } else {
-                return lfh;
-            }
+            if (lfh==null) lfh = new LogFileHistory();
         }
+        return lfh;
     }
 
 }
