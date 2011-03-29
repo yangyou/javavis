@@ -28,7 +28,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.event.MouseInputListener;
 
-public class GraphPanel extends JPanel  
+class GraphPanel extends JPanel  
 {
 	private static final long serialVersionUID = 1L;
 	// Empty borders
@@ -62,7 +62,8 @@ public class GraphPanel extends JPanel
 			"Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
 	private int startx = -1;
 	private int endx = -1;
-
+	private final InternalListener popup = new InternalListener();
+	
 	// constructor
 	public GraphPanel() {
 		// set the default ranges
@@ -71,15 +72,13 @@ public class GraphPanel extends JPanel
 
 		// set the flags
 		loggerstate = nologloaded;
-		
-		PopupTriggerListener popup = new PopupTriggerListener();
 		addMouseListener(popup);
 		addMouseMotionListener(popup);
 
 		setBackground(Color.lightGray);
 	}
 
-	class PopupTriggerListener implements MouseInputListener,MouseListener, ActionListener{
+	class InternalListener implements MouseInputListener,MouseListener, ActionListener{
 		public void mousePressed(MouseEvent ev) {
 			if (ev.isPopupTrigger()) {
 				JPopupMenu pm = new JPopupMenu("Zoom");

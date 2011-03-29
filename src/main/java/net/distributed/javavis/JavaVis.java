@@ -17,7 +17,7 @@ import javax.swing.*;
 public class JavaVis extends JFrame
 {
 	private static final long serialVersionUID = 1L;
-	GraphPanel graphPanel;
+	final GraphPanel graphPanel = createComponents();
     final AboutDialog aboutDialog = new AboutDialog(this);
     final LogFileHistory lfh;
     JMenuItem refreshItem;
@@ -113,10 +113,9 @@ public class JavaVis extends JFrame
                 menuBar.add(menu);
             }
         
-        JComponent contents = createComponents();
         //getContentPane().add(contents, BorderLayout.CENTER);
         setBackground(Color.lightGray);
-        add(contents, BorderLayout.CENTER);
+        add(graphPanel, BorderLayout.CENTER);
         add("West",new leftPanel());
         add("South",new JLabel("Work Unit completion date",JLabel.CENTER));
 
@@ -135,10 +134,10 @@ public class JavaVis extends JFrame
         
     }
 
-    public JComponent createComponents()
+    public GraphPanel createComponents()
     {
         // Create an internal panel to hold the graph
-        graphPanel = new GraphPanel()
+        return new GraphPanel()
         {
 			private static final long serialVersionUID = 1L;
 
@@ -147,8 +146,6 @@ public class JavaVis extends JFrame
                 return new Dimension(620,320);
             }
         };
-
-        return graphPanel;
     }
 
     public static void main(String[] args)
