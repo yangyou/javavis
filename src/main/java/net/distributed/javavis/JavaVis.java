@@ -1,26 +1,36 @@
 // Copyright distributed.net 1997-2002- All Rights Reserved
 // For use in distributed.net projects only.
 // Any other distribution or use of this source violates copyright.
-package net.distributed.javavis;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.File;
-import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+
+//import com.apple.mrj.*; // MRJToolkitStubs.zip provides empty declarations to link against
+
+/* 
+class MacOSMRJToolkitFrame extends JavaVis implements MRJAboutHandler, MRJOpenDocumentHandler, MRJQuitHandler
+{
+    public MacOSMRJToolkitFrame(String title)
+    {
+        // Parent Constructor
+        super(title);
+        
+       // Register ourselves with MacOS Runtime for Java (MRJ) system event handlers
+        MRJApplicationUtils.registerAboutHandler(this);
+        MRJApplicationUtils.registerQuitHandler(this);
+        MRJApplicationUtils.registerOpenDocumentHandler(this);   
+    }
+}
+*/
 
 // Main Frame
-public class JavaVis extends JFrame
+public class JavaVis extends Frame
 {
-	private static final long serialVersionUID = 1L;
-	final GraphPanel graphPanel = createComponents();
+    GraphPanel graphPanel;
     final AboutDialog aboutDialog = new AboutDialog(this);
     final LogFileHistory lfh;
-    JMenuItem refreshItem;
+    MenuItem refreshItem;
     static String[] arguments;
 
     // Constructor
@@ -35,39 +45,45 @@ public class JavaVis extends JFrame
         //}
 
         // Create Menu
-        final JMenuBar menuBar = new JMenuBar();
-        this.setJMenuBar(menuBar);
+        MenuBar menuBar;
+        Menu menu;
+        MenuItem menuItem;
 
-        JMenu menu = new JMenu("File");
-        menu.setMnemonic('F');
+        menuBar = new MenuBar();
+        this.setMenuBar(menuBar);
+
+        menu = new Menu("File");
+        menu.setShortcut(new MenuShortcut(KeyEvent.VK_F));
         menuBar.add(menu);
 
-        JMenuItem menuItem = new JMenuItem("Open log file...");
-        final JFileChooser fileDialog = new JFileChooser();
-        menu.addActionListener(new ActionListener() {
+        menuItem = new MenuItem("Open log file...");
+        final FileDialog fileDialog = new FileDialog(this);
+        menuItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 // Create a file chooser
-                fileDialog.showOpenDialog(menuBar);
+                fileDialog.setMode(FileDialog.LOAD);
+                fileDialog.show();
 
                 // In response to a button click:
-                File file = fileDialog.getSelectedFile();
-                if (file != null) {
+                String filename = fileDialog.getFile();
+                if (filename != null) {
+                    File file = new File(fileDialog.getDirectory(), filename);
                     lfh.addFile(file);
                     handleOpenFile(file);
                 }
 
             }
         });
-        menuItem.setMnemonic('0');
+        menuItem.setShortcut(new MenuShortcut(KeyEvent.VK_O));
         menu.add(menuItem);
 
-        refreshItem = new JMenuItem("Refresh");
+        refreshItem = new MenuItem("Refresh");
         refreshItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 graphPanel.readLogData();
             }
         });
-        refreshItem.setMnemonic('R');
+        refreshItem.setShortcut(new MenuShortcut(KeyEvent.VK_R));
         refreshItem.setEnabled(false);
         menu.add(refreshItem);
         menu.addSeparator();
@@ -76,34 +92,38 @@ public class JavaVis extends JFrame
         File[] files = lfh.getFiles();
         for(int i = 0; i< files.length; i++){
             if(files[i] != null){
-                menuItem = new JMenuItem(files[i].toString());
+                menuItem = new MenuItem(files[i].toString());
                 menu.add(menuItem);
-                menu.addActionListener(new ActionListener() {
+                menuItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e){
-                            handleOpenFile(new File(((JMenuItem)e.getSource()).getText()));
+                            handleOpenFile(new File(((MenuItem)e.getSource()).getLabel()));
                     }
                 });
             }
         }
 
-        menuItem = new JMenuItem("Quit");
-        menu.addActionListener(new ActionListener() {
+        menuItem = new MenuItem("Quit");
+        menuItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 handleQuit();
             }
         });
-        menu.setMnemonic('Q');
-        menu.add(menu);
-            menu = new JMenu("Help");
+        menuItem.setShortcut(new MenuShortcut(KeyEvent.VK_Q));
+        menu.add(menuItem);
 
-            menuItem = new JMenuItem("About JavaVis...");
+//        if (MRJApplicationUtils.isMRJToolkitAvailable() && System.getProperty("os.name").equals("Mac OS")) {
+            // Under "Mac OS" (!="Mac OS X") the "About box" is provided by the MRJApplicationUtils
+//        } else {
+            menu = new Menu("Help");
+
+            menuItem = new MenuItem("About JavaVis...");
             menuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     handleAbout();
                 }
             });
-            menu.setMnemonic('A');
-            menu.add(menu);
+            menuItem.setShortcut(new MenuShortcut(KeyEvent.VK_A));
+            menu.add(menuItem);
             try {
                 menuBar.setHelpMenu(menu);
                 // avoid the double Help menu problem on Mac OS 8 and later
@@ -112,12 +132,14 @@ public class JavaVis extends JFrame
                 // fall back on old strategy
                 menuBar.add(menu);
             }
+//        }
         
+        Component contents = createComponents();
         //getContentPane().add(contents, BorderLayout.CENTER);
         setBackground(Color.lightGray);
-        add(graphPanel, BorderLayout.CENTER);
+        add(contents, BorderLayout.CENTER);
         add("West",new leftPanel());
-        add("South",new JLabel("Work Unit completion date",JLabel.CENTER));
+        add("South",new Label("Work Unit completion date",Label.CENTER));
 
         // Finish setting up the frame, and show it.
         addWindowListener(new WindowAdapter() {
@@ -134,26 +156,32 @@ public class JavaVis extends JFrame
         
     }
 
-    public GraphPanel createComponents()
+    public Component createComponents()
     {
         // Create an internal panel to hold the graph
-        return new GraphPanel()
+        graphPanel = new GraphPanel()
         {
-			private static final long serialVersionUID = 1L;
-
-			public Dimension getPreferredSize()
+            public Dimension getPreferredSize()
             {
                 return new Dimension(620,320);
             }
         };
+
+        return graphPanel;
     }
 
     public static void main(String[] args)
     {
         arguments = args;
-
-		// Create the top-level container and add contents to it.
-		new JavaVis("distributed.net Logfile Visualizer");
+        
+//        if (MRJApplicationUtils.isMRJToolkitAvailable()) {
+//            // Create the top-level container and add contents to it.
+//            final MacOSMRJToolkitFrame app = new MacOSMRJToolkitFrame("distributed.net Logfile Visualizer");
+//		  }
+//		  else {
+            // Create the top-level container and add contents to it.
+            final JavaVis app = new JavaVis("distributed.net Logfile Visualizer");
+//        }
     }
 
     public void handleOpenFile(File file) {
@@ -165,7 +193,7 @@ public class JavaVis extends JFrame
     }
 
     public void handleAbout() {
-        aboutDialog.setVisible(true);
+        aboutDialog.show();
     }
 
     public void handleQuit() {
